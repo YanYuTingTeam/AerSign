@@ -1,0 +1,19 @@
+name: AerSign
+version: 1.0.0
+main: com.aermini.sign.AerSign
+author: AerMini
+
+commands:
+  aersign:
+    usage: /aersign open [玩家名] | /aersign reload | /aersign resign <玩家名> | /aersign reall <玩家名>
+    permission: aersign.use
+
+permissions:
+  aersign.use:
+    default: op
+  aersign.open:
+    default: op
+  aersign.reload:
+    default: op
+  aersign.admin:
+    default: op
