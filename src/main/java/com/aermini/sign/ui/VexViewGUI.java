@@ -130,4 +130,12 @@ public class VexViewGUI {
                 Integer.parseInt(parts[3].trim())
         };
     }
+
+    public static boolean hasVexView(Player player) {
+        try {
+            return VexViewAPI.getPlayerClientWindowWidth(player) > 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

@@ -67,7 +67,7 @@ public class SignCommand implements CommandExecutor {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 if (args.length == 1) {
-                    if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                    if (Bukkit.getPluginManager().getPlugin("VexView") != null && VexViewGUI.isEnabled() && VexViewGUI.hasVexView(player)) {
                         VexViewGUI.openGUI(player);
                     } else {
                         SignGUI.openGUI(player);
@@ -82,7 +82,7 @@ public class SignCommand implements CommandExecutor {
                         player.sendMessage(AerSign.color("&c玩家 " + args[1] + " 不在线"));
                         return true;
                     }
-                    if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                    if (Bukkit.getPluginManager().getPlugin("VexView") != null && VexViewGUI.isEnabled() && VexViewGUI.hasVexView(target)) {
                         VexViewGUI.openGUI(target);
                     } else {
                         SignGUI.openGUI(target);
@@ -101,7 +101,7 @@ public class SignCommand implements CommandExecutor {
                     sender.sendMessage(AerSign.color("&c玩家 " + args[1] + " 不在线"));
                     return true;
                 }
-                if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                if (Bukkit.getPluginManager().getPlugin("VexView") != null && VexViewGUI.isEnabled() && VexViewGUI.hasVexView(target)) {
                     VexViewGUI.openGUI(target);
                 } else {
                     SignGUI.openGUI(target);
