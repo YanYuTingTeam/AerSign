@@ -75,7 +75,6 @@ public class VexViewGUI {
         // 签到按钮
         String btnUrl = hasSignedToday ? vexConfig.getString("btno") : vexConfig.getString("btn");
         ButtonFunction btnFunc = p -> {
-            playClickSound(p);
             doSign(p);
         };
         components.add(new VexButton(1, "", btnUrl, btnUrl, btnX, btnY, btnW, btnH, btnFunc));
@@ -108,17 +107,6 @@ public class VexViewGUI {
 
         // 刷新gui
         Bukkit.getScheduler().runTaskLater(AerSign.getInstance(), () -> openGUI(player), 1L);
-    }
-
-    private static void playClickSound(Player player) {
-        try {
-            player.playSound(player.getLocation(), Sound.valueOf("UI_BUTTON_CLICK"), 1.0f, 1.0f);
-        } catch (IllegalArgumentException e) {
-            try {
-                player.playSound(player.getLocation(), Sound.valueOf("CLICK"), 1.0f, 1.0f);
-            } catch (IllegalArgumentException ignored) {
-            }
-        }
     }
 
     private static int[] parseSize(String s) {
