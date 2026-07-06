@@ -104,6 +104,25 @@ public class SignGUI {
         return text;
     }
 
+    public static void executeSignCommands(Player player, int day) {
+        String dayPath = "day" + day;
+        List<String> commands = AerSign.getInstance().getConfig().getStringList(dayPath + ".commands");
+        for (String cmd : commands) {
+            cmd = cmd.replace("{player}", player.getName());
+            cmd = cmd.replace("{day}", String.valueOf(day));
+            if (cmd.startsWith("[CMD] ")) {
+                String consoleCmd = cmd.substring(6);
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), consoleCmd);
+            } else if (cmd.startsWith("[MESSAGE] ")) {
+                String message = cmd.substring(10);
+                player.sendMessage(AerSign.color(message));
+            } else if (cmd.startsWith("[COMMAND] ")) {
+                String playerCmd = cmd.substring(10);
+                Bukkit.dispatchCommand(player, playerCmd);
+            }
+        }
+    }
+
     public static int getDayFromSlot(int slot) {
         for (Map.Entry<Integer, Integer> entry : SLOT_MAPPING.entrySet()) {
             if (entry.getValue() == slot) {

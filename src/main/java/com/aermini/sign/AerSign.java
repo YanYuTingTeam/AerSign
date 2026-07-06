@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.aermini.sign.command.SignCommand;
 import com.aermini.sign.listener.SignListener;
 import com.aermini.sign.manager.DatabaseManager;
+import com.aermini.sign.ui.VexViewGUI;
 
 public final class AerSign extends JavaPlugin {
     private static AerSign instance;
@@ -18,6 +19,10 @@ public final class AerSign extends JavaPlugin {
         saveDefaultConfig();
         databaseManager = new DatabaseManager();
         databaseManager.initialize();
+        VexViewGUI.loadConfig(this);
+        if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+            getLogger().info("检测到VexView，已启用自定义UI");
+        }
         getCommand("aersign").setExecutor(new SignCommand());
         Bukkit.getPluginManager().registerEvents(new SignListener(), this);
         getLogger().info("AerSign 已启用");

@@ -3,6 +3,7 @@ package com.aermini.sign.command;
 import com.aermini.sign.AerSign;
 import com.aermini.sign.manager.DatabaseManager;
 import com.aermini.sign.ui.SignGUI;
+import com.aermini.sign.ui.VexViewGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -66,7 +67,11 @@ public class SignCommand implements CommandExecutor {
             if (sender instanceof Player) {
                 Player player = (Player) sender;
                 if (args.length == 1) {
-                    SignGUI.openGUI(player);
+                    if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                        VexViewGUI.openGUI(player);
+                    } else {
+                        SignGUI.openGUI(player);
+                    }
                 } else if (args.length == 2) {
                     if (!player.hasPermission("aersign.open")) {
                         player.sendMessage(AerSign.color("&c你没有权限使用这个命令"));
@@ -77,7 +82,11 @@ public class SignCommand implements CommandExecutor {
                         player.sendMessage(AerSign.color("&c玩家 " + args[1] + " 不在线"));
                         return true;
                     }
-                    SignGUI.openGUI(target);
+                    if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                        VexViewGUI.openGUI(target);
+                    } else {
+                        SignGUI.openGUI(target);
+                    }
                 } else {
                     player.sendMessage(AerSign.color("&c用法: /aersign open <玩家名>"));
                 }
@@ -92,7 +101,11 @@ public class SignCommand implements CommandExecutor {
                     sender.sendMessage(AerSign.color("&c玩家 " + args[1] + " 不在线"));
                     return true;
                 }
-                SignGUI.openGUI(target);
+                if (Bukkit.getPluginManager().isPluginEnabled("VexView") && VexViewGUI.isEnabled()) {
+                    VexViewGUI.openGUI(target);
+                } else {
+                    SignGUI.openGUI(target);
+                }
             }
         } else {}
         return true;

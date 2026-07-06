@@ -3,6 +3,9 @@ version: 1.0.0
 main: com.aermini.sign.AerSign
 author: AerMini
 
+softdepend:
+  - VexView
+
 commands:
   aersign:
     usage: /aersign open [玩家名] | /aersign reload | /aersign resign <玩家名> | /aersign reall <玩家名>

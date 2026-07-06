@@ -10,8 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
-
 public class SignListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -35,7 +33,7 @@ public class SignListener implements Listener {
 
         if (hasSignedToday) return;
         if (day != h + 1) return;
-        executeSignCommands(player, day);
+        SignGUI.executeSignCommands(player, day);
         db.incrementSignCount(uuid);
         String dayPath = "day" + day;
         String formatName = AerSign.getInstance().getConfig().getString(dayPath + ".format_name");
@@ -46,26 +44,5 @@ public class SignListener implements Listener {
             player.closeInventory();
             SignGUI.openGUI(player);
         }, 1L);
-    }
-
-    private void executeSignCommands(Player player, int day) {
-        String dayPath = "day" + day;
-        List<String> commands = AerSign.getInstance().getConfig().getStringList(dayPath + ".commands");
-        for (String cmd : commands) {
-            cmd = cmd.replace("{player}", player.getName());
-            cmd = cmd.replace("{day}", String.valueOf(day));
-            if (cmd.startsWith("[CMD] ")) {
-                // 控制台执行
-                String consoleCmd = cmd.substring(6);
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), consoleCmd);
-            } else if (cmd.startsWith("[MESSAGE] ")) {
-                String message = cmd.substring(10);
-                player.sendMessage(AerSign.color(message));
-            } else if (cmd.startsWith("[COMMAND] ")) {
-                // 玩家身份执行
-                String playerCmd = cmd.substring(10);
-                Bukkit.dispatchCommand(player, playerCmd);
-            }
-        }
     }
 }
