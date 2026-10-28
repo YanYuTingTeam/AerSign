@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.aermini.sign.command.SignCommand;
 import com.aermini.sign.listener.SignListener;
 import com.aermini.sign.manager.DatabaseManager;
+import com.aermini.sign.nms.SignNmsProvider;
 import com.aermini.sign.ui.VexViewGUI;
 
 public final class AerSign extends JavaPlugin {
@@ -17,6 +18,7 @@ public final class AerSign extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        getLogger().info("版本适配: " + SignNmsProvider.get().versionName());
         databaseManager = new DatabaseManager();
         databaseManager.initialize();
         VexViewGUI.loadConfig(this);
@@ -45,6 +47,9 @@ public final class AerSign extends JavaPlugin {
     }
 
     public static String color(String message) {
+        if (message == null) {
+            return "";
+        }
         return ChatColor.translateAlternateColorCodes('&', message);
     }
 }

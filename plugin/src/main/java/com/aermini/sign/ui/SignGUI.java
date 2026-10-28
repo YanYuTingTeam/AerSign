@@ -2,8 +2,10 @@ package com.aermini.sign.ui;
 
 import com.aermini.sign.AerSign;
 import com.aermini.sign.manager.DatabaseManager;
+import com.aermini.sign.nms.SignNmsProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -59,10 +61,8 @@ public class SignGUI {
             type = "cant_claim";
         }
         String materialName = AerSign.getInstance().getConfig().getString("ui.items." + type + ".item");
-        Material material;
-        try {
-            material = Material.valueOf(materialName);
-        } catch (IllegalArgumentException e) {
+        Material material = SignNmsProvider.get().material(materialName);
+        if (material == null) {
             material = Material.PAPER;
         }
         ItemStack item = new ItemStack(material);
@@ -84,7 +84,10 @@ public class SignGUI {
         meta.setLore(coloredLore);
         boolean glow = AerSign.getInstance().getConfig().getBoolean("ui.items." + type + ".glow");
         if (glow) {
-            meta.addEnchant(org.bukkit.enchantments.Enchantment.DURABILITY, 1, true);
+            Enchantment glowEnchant = SignNmsProvider.get().glowEnchant();
+            if (glowEnchant != null) {
+                meta.addEnchant(glowEnchant, 1, true);
+            }
         }
 
         item.setItemMeta(meta);
@@ -110,15 +113,19 @@ public class SignGUI {
         for (String cmd : commands) {
             cmd = cmd.replace("{player}", player.getName());
             cmd = cmd.replace("{day}", String.valueOf(day));
-            if (cmd.startsWith("[CMD] ")) {
-                String consoleCmd = cmd.substring(6);
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), consoleCmd);
-            } else if (cmd.startsWith("[MESSAGE] ")) {
-                String message = cmd.substring(10);
-                player.sendMessage(AerSign.color(message));
-            } else if (cmd.startsWith("[COMMAND] ")) {
-                String playerCmd = cmd.substring(10);
-                Bukkit.dispatchCommand(player, playerCmd);
+            try {
+                if (cmd.startsWith("[CMD] ")) {
+                    String consoleCmd = cmd.substring(6);
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), consoleCmd);
+                } else if (cmd.startsWith("[MESSAGE] ")) {
+                    String message = cmd.substring(10);
+                    player.sendMessage(AerSign.color(message));
+                } else if (cmd.startsWith("[COMMAND] ")) {
+                    String playerCmd = cmd.substring(10);
+                    Bukkit.dispatchCommand(player, playerCmd);
+                }
+            } catch (Exception e) {
+                AerSign.getInstance().getLogger().warning("签到命令执行失败: " + cmd);
             }
         }
     }

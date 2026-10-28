@@ -13,10 +13,11 @@ import org.bukkit.inventory.ItemStack;
 public class SignListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getInventory().getTitle() == null) return;
+        if (event.getView().getTitle() == null) return;
         String title = AerSign.color(AerSign.getInstance().getConfig().getString("ui.title"));
-        if (!event.getInventory().getTitle().equals(title)) return;
+        if (!event.getView().getTitle().equals(title)) return;
         event.setCancelled(true);
+        if (event.getRawSlot() >= event.getView().getTopInventory().getSize()) return;
         if (!(event.getWhoClicked() instanceof Player)) return;
         Player player = (Player) event.getWhoClicked();
         ItemStack clickedItem = event.getCurrentItem();
@@ -33,13 +34,18 @@ public class SignListener implements Listener {
 
         if (hasSignedToday) return;
         if (day != h + 1) return;
+        if (!db.incrementSignCount(uuid)) {
+            player.sendMessage(AerSign.color("&c签到失败, 请稍后再试"));
+            return;
+        }
         SignGUI.executeSignCommands(player, day);
-        db.incrementSignCount(uuid);
         String dayPath = "day" + day;
         String formatName = AerSign.getInstance().getConfig().getString(dayPath + ".format_name");
         String message = AerSign.getInstance().getConfig().getString("message");
-        message = message.replace("{format_name}", formatName);
-        player.sendMessage(AerSign.color(message));
+        if (message != null) {
+            message = message.replace("{format_name}", formatName);
+            player.sendMessage(AerSign.color(message));
+        }
         Bukkit.getScheduler().runTaskLater(AerSign.getInstance(), () -> {
             player.closeInventory();
             SignGUI.openGUI(player);

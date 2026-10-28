@@ -2,7 +2,6 @@ package com.aermini.sign.manager;
 
 import com.aermini.sign.AerSign;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DatabaseManager {
@@ -12,6 +11,7 @@ public class DatabaseManager {
         String database = AerSign.getInstance().getConfig().getString("database.database");
         String username = AerSign.getInstance().getConfig().getString("database.username");
         String password = AerSign.getInstance().getConfig().getString("database.password");
+        loadDriver();
         try {
             connection = DriverManager.getConnection(
                 "jdbc:mysql://" + address + "/" + database + "?useSSL=false&autoReconnect=true",
@@ -21,8 +21,18 @@ public class DatabaseManager {
             createTables();
             AerSign.getInstance().getLogger().info("数据库连接成功");
         } catch (SQLException e) {
+            closeConnection();
+            connection = null;
             AerSign.getInstance().getLogger().severe("数据库连接失败");
             e.printStackTrace();
+        }
+    }
+
+    private void loadDriver() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            AerSign.getInstance().getLogger().warning("未找到内置 MySQL 驱动, 使用服务端自带驱动");
         }
     }
 
@@ -40,6 +50,9 @@ public class DatabaseManager {
     }
 
     public boolean hasPlayerData(String uuid) {
+        if (connection == null) {
+            return false;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "SELECT uuid FROM aersign_data WHERE uuid = ?")) {
             stmt.setString(1, uuid);
@@ -52,6 +65,9 @@ public class DatabaseManager {
     }
 
     public void createPlayerData(String uuid) {
+        if (connection == null) {
+            return;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "INSERT INTO aersign_data (uuid, total_sign_count, last_sign_date) VALUES (?, 0, NULL)")) {
             stmt.setString(1, uuid);
@@ -62,6 +78,9 @@ public class DatabaseManager {
     }
 
     public int getTotalSignCount(String uuid) {
+        if (connection == null) {
+            return 0;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "SELECT total_sign_count FROM aersign_data WHERE uuid = ?")) {
             stmt.setString(1, uuid);
@@ -75,17 +94,24 @@ public class DatabaseManager {
         return 0;
     }
 
-    public void incrementSignCount(String uuid) {
+    public boolean incrementSignCount(String uuid) {
+        if (connection == null) {
+            return false;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "UPDATE aersign_data SET total_sign_count = total_sign_count + 1, last_sign_date = CURDATE() WHERE uuid = ?")) {
             stmt.setString(1, uuid);
-            stmt.executeUpdate();
+            return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public Date getLastSignDate(String uuid) {
+        if (connection == null) {
+            return null;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "SELECT last_sign_date FROM aersign_data WHERE uuid = ?")) {
             stmt.setString(1, uuid);
@@ -100,18 +126,24 @@ public class DatabaseManager {
     }
 
     public boolean hasSignedToday(String uuid) {
-        Date lastSignDate = getLastSignDate(uuid);
-        if (lastSignDate == null) {
+        if (connection == null) {
             return false;
         }
-        Date today = new Date(System.currentTimeMillis());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String lastSignDateStr = sdf.format(lastSignDate);
-        String todayStr = sdf.format(today);
-        return lastSignDateStr.equals(todayStr);
+        try (PreparedStatement stmt = connection.prepareStatement(
+            "SELECT 1 FROM aersign_data WHERE uuid = ? AND last_sign_date = CURDATE()")) {
+            stmt.setString(1, uuid);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void resetTodaySignStatus(String uuid) {
+        if (connection == null) {
+            return;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "UPDATE aersign_data SET last_sign_date = NULL WHERE uuid = ?")) {
             stmt.setString(1, uuid);
@@ -122,6 +154,9 @@ public class DatabaseManager {
     }
 
     public void resetAllSignData(String uuid) {
+        if (connection == null) {
+            return;
+        }
         try (PreparedStatement stmt = connection.prepareStatement(
             "UPDATE aersign_data SET total_sign_count = 0, last_sign_date = NULL WHERE uuid = ?")) {
             stmt.setString(1, uuid);

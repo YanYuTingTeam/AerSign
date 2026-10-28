@@ -5,15 +5,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aermini</groupId>
-    <artifactId>AerSign</artifactId>
+    <artifactId>aersign</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>AerSign</name>
+
+    <modules>
+        <module>nms/api</module>
+        <module>nms/v1_8_R1</module>
+        <module>nms/v1_13_R1</module>
+        <module>nms/v1_20_R4</module>
+        <module>plugin</module>
+    </modules>
 
     <properties>
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <bukkit.version>1.8.8-R0.1-SNAPSHOT</bukkit.version>
+        <mysql.version>8.3.0</mysql.version>
     </properties>
 
     <repositories>
@@ -27,36 +37,43 @@
         </repository>
     </repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>8.3.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>lk.vexview</groupId>
-            <artifactId>VexView</artifactId>
-            <version>2.3.8</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vexview.jar</systemPath>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.bukkit</groupId>
+                <artifactId>bukkit</artifactId>
+                <version>${bukkit.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aermini</groupId>
+                <artifactId>aersign-nms-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aermini</groupId>
+                <artifactId>aersign-nms-v1_8_R1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aermini</groupId>
+                <artifactId>aersign-nms-v1_13_R1</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aermini</groupId>
+                <artifactId>aersign-nms-v1_20_R4</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
-        <finalName>AerSign-${project.version}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

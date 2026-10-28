@@ -94,16 +94,22 @@ public class VexViewGUI {
         int day = h + 1;
         if (day < 1 || day > 7) return;
 
+        if (!db.incrementSignCount(uuid)) {
+            player.sendMessage(AerSign.color("&c签到失败, 请稍后再试"));
+            return;
+        }
+
         // 执行签到命令
         SignGUI.executeSignCommands(player, day);
-        db.incrementSignCount(uuid);
 
         // 发送签到消息
         String dayPath = "day" + day;
         String formatName = AerSign.getInstance().getConfig().getString(dayPath + ".format_name");
         String message = AerSign.getInstance().getConfig().getString("message");
-        message = message.replace("{format_name}", formatName);
-        player.sendMessage(AerSign.color(message));
+        if (message != null) {
+            message = message.replace("{format_name}", formatName);
+            player.sendMessage(AerSign.color(message));
+        }
 
         // 刷新gui
         Bukkit.getScheduler().runTaskLater(AerSign.getInstance(), () -> openGUI(player), 1L);
